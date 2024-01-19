@@ -1,9 +1,16 @@
 -- Set the desired colors for each prefix
-local colorTable = {
-    P = 0xFF0000, -- Red
-    v = 0x00FF00, -- Green
-    SFX = 0x0000FF, -- Blue
-    -- Add more prefixes and colors as needed
+local colourTable_priority = {
+    [' v'] = 0x264A16, -- Dark Green
+    [' del'] = 0x264A16, -- Dark Green
+}
+
+local colourTable = {
+    -- In Reaper, the format is 0xBBGGRR in hex
+    Atmos = 0x227527, -- Green
+    Foley = 0xAB4A43, -- Blue
+    SFX = 0x4874CF,  -- Orange
+    Dx = 0x2AC5DC,  -- Yellow
+    Mx = 0x8924C8, -- Pink
 }
 
 -- Function to set track color based on the first letter of the track name
@@ -19,13 +26,26 @@ function colorTracksByPrefix()
         -- Get the track name
         local _, trackName = reaper.GetSetMediaTrackInfo_String(track, "P_NAME", "", false)
 
-        -- Extract the first letter of the track name
-        local firstLetter = trackName:sub(1, 1)
+        local matchFound = false
+        for k, v in pairs(colourTable_priority) do
+            local i, j = string.find(trackName, k)
+            if i then
+                local key = string.sub(trackName, i, j)
+                local colourToChangeTo = colourTable_priority[key]
+                reaper.SetTrackColor(track, colourToChangeTo)
+                matchFound = true
+            end
+        end
 
-        -- Check if the first letter has a corresponding color in the table
-        if colorTable[firstLetter] then
-            -- Set the track color
-            reaper.SetTrackColor(track, colorTable[firstLetter])
+        if not matchFound then
+            for k, v in pairs(colourTable) do
+                local i, j = string.find(trackName, k)
+                if i then
+                    local key = string.sub(trackName, i, j)
+                    local colourToChangeTo = colourTable[key]
+                    reaper.SetTrackColor(track, colourToChangeTo)
+                end
+            end
         end
     end
 end
