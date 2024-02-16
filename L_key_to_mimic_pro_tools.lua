@@ -55,8 +55,11 @@ function moveToClosestPreviousBoundaryOnSelectedTrack()
     if closestPreviousBoundary < screenStart or closestPreviousBoundary > screenEnd then
         --reaper.adjustZoom(1, 1, true, 0, closestPreviousBoundary)
         if closestPreviousBoundary > screenZoomWidthDistance then
-            
-            -- zoom in?
+            local forceCast = 0
+            local zoomClicks = -1 -- negative numbers zoom in, positive numbers zoom out
+            --local applyToWholeProject = true
+            local centremode = -1
+            reaper.adjustZoom(project, forceCast, zoomClicks, centremode)
         end
     end
 end

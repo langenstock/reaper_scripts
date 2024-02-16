@@ -45,7 +45,11 @@ function moveToCloserPositionOnSelectedTrack()
         -- Check if the new cursor position is not in view and center the view
         local screenStart, screenEnd = reaper.GetSet_ArrangeView2(0, false, 0, 0)
         if closerPosition < screenStart or closerPosition > screenEnd then
-            --reaper.adjustZoom(1, 1, true, 0, closerPosition)
+            local forceCast = 0
+            local zoomClicks = -1 -- negative numbers zoom in, positive numbers zoom out
+            --local applyToWholeProject = true
+            local centremode = -1
+            reaper.adjustZoom(project, forceCast, zoomClicks, centremode)
         end
     else
         reaper.ShowMessageBox("No next clip found on the selected track.", "Info", 0)

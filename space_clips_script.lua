@@ -4,9 +4,37 @@
 -- Especially if running this script over multiple tracks
 -- To preserve original item order, run the script track by track and perhaps move groups after the fact
 
-function spaceOutSelectedItems()
+local SPACING_FACTOR = 1
 
-    local SPACING_FACTOR = 1
+function initialCheck()
+    local initialSelectedItemscount = reaper.CountSelectedMediaItems(0)
+
+    if initialSelectedItemscount < 2 then
+        reaper.ShowMessageBox("Select at least 2 clips, dipshit.", "Error", 0)
+        return false
+    end
+    return true
+end
+
+
+function getSpacingValueFromUser()
+    -- Get user input using reaper.GetUserInputs
+    local retval, userInput = reaper.GetUserInputs("User Input", 1, "Enter a number:", "")
+    if retval then
+        local numericValue = tonumber(userInput)
+        if numericValue then
+            --reaper.ShowConsoleMsg("User Input: " .. numericValue .. "\n")
+            SPACING_FACTOR = numericValue
+        else
+            reaper.ShowConsoleMsg("Invalid input. Please enter a number.\n")
+        end
+    else
+        reaper.ShowConsoleMsg("User canceled the input.\n")
+        return
+    end
+end
+
+function spaceOutSelectedItems()
 
     -- Get the selected items
     selectedItems = reaper.CountSelectedMediaItems(0)
@@ -69,17 +97,23 @@ function checkAllItemBoundaries()
 end
 
 -- Run the function
-reaper.Undo_BeginBlock()
 
-for i = 1, 10 do
-    if i == 1 then
-      spaceOutSelectedItems()
-    else
-      if checkAllItemBoundaries() == false then
-        spaceOutSelectedItems()
-      else
-        return
-      end
+if initialCheck() then
+
+    reaper.Undo_BeginBlock()
+    
+    getSpacingValueFromUser()
+    
+    for i = 1, 10 do
+        if i == 1 then
+          spaceOutSelectedItems()
+        else
+          if checkAllItemBoundaries() == false then
+            spaceOutSelectedItems()
+          else
+            return
+          end
+        end
     end
 end
 
