@@ -24,23 +24,26 @@ function createRegionsForClips()
 
     -- Iterate through each item and create a region
     for i = 0, itemCount - 1 do
-        --reaper.ShowMessageBox("i: "..i, "Error", 0)
         local item = reaper.GetSelectedMediaItem(project, i)
-        local active_take = reaper.GetActiveTake(item)
-        local _, take_name = reaper.GetSetMediaItemTakeInfo_String(active_take, "P_NAME", "", false)
         
-        local position = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
-        local length = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
+        local itemMuteState = reaper.GetMediaItemInfo_Value(item, "B_MUTE")
+        local muteStateValue = 1
         
-        -- Create a region for each item
-        local isrgn = true
-        local regionIndex = reaper.AddProjectMarker2(project, isrgn, position, position + length, take_name, -1, 0)
-        if regionIndex == -1 then
-          reaper.ShowMessageBox("Whoopsied.", "Error", 0)
+        -- If the item is muted then skip this one
+        if itemMuteState ~= muteStateValue then
+            local active_take = reaper.GetActiveTake(item)
+            local _, take_name = reaper.GetSetMediaItemTakeInfo_String(active_take, "P_NAME", "", false)
+            
+            local position = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+            local length = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
+            
+            -- Create a region for each item
+            local isrgn = true
+            local regionIndex = reaper.AddProjectMarker2(project, isrgn, position, position + length, take_name, -1, 0)
+            if regionIndex == -1 then
+              reaper.ShowMessageBox("Whoopsied.", "Error", 0)
+            end
         end
-        
-        -- Each time we run the script, a random colour will be used for this batch of regions
-        --reaper.SetProjectMarker4(project, regionIndex, false, r, g, b)
     end
     -- End undo block
     reaper.Undo_EndBlock("Create Regions for Clips", -1)

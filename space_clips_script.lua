@@ -19,18 +19,20 @@ end
 
 function getSpacingValueFromUser()
     -- Get user input using reaper.GetUserInputs
-    local retval, userInput = reaper.GetUserInputs("User Input", 1, "Enter a number:", "")
+    local retval, userInput = reaper.GetUserInputs("User Input", 1, "Space between items:", "")
     if retval then
         local numericValue = tonumber(userInput)
         if numericValue then
             --reaper.ShowConsoleMsg("User Input: " .. numericValue .. "\n")
             SPACING_FACTOR = numericValue
+            return true
         else
             reaper.ShowConsoleMsg("Invalid input. Please enter a number.\n")
+            return false
         end
     else
         reaper.ShowConsoleMsg("User canceled the input.\n")
-        return
+        return false
     end
 end
 
@@ -55,7 +57,6 @@ function spaceOutSelectedItems()
         local currentPosition = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
        
         local currentItemsLength = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
-        --reaper.ShowMessageBox("currentPosition: "..currentPosition..' , currentItemsLength: '..currentItemsLength, "Error", 0)
         
         local positionToMoveTo
         if i == 0 then
@@ -96,28 +97,28 @@ function checkAllItemBoundaries()
     return false
 end
 
--- Run the function
-
-if initialCheck() then
-
-    reaper.Undo_BeginBlock()
-    
-    getSpacingValueFromUser()
-    
-    for i = 1, 10 do
-        if i == 1 then
-          spaceOutSelectedItems()
-        else
-          if checkAllItemBoundaries() == false then
-            spaceOutSelectedItems()
-          else
-            return
-          end
+function main()
+    if initialCheck() then
+        reaper.Undo_BeginBlock()
+        
+        if getSpacingValueFromUser() == true then
+            for i = 1, 10 do
+                if i == 1 then
+                  spaceOutSelectedItems()
+                else
+                  if checkAllItemBoundaries() == false then
+                    spaceOutSelectedItems()
+                  else
+                    return
+                  end
+                end
+            end
         end
     end
+    reaper.Undo_EndBlock("Space Out Selected Items", -1)
 end
 
---spaceOutSelectedItems()
---checkAllItemBoundaries()
-reaper.Undo_EndBlock("Space Out Selected Items", -1)
+-- Run main
+main()
+
 

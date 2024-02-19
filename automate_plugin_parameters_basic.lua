@@ -1,9 +1,11 @@
 -- Automate Plugin Parameters Script
 
 local numberOfAutomationNodes
+local b_firstTimeThrough = true
+
+local laneProcessedAlready = {}
 
 function main()
-
     local track = reaper.GetSelectedTrack(0, 0)
     if track then
         -- Get the number of selected items on the track
@@ -13,9 +15,8 @@ function main()
         local startPosition = math.huge
         local endPosition = -math.huge
         
+        -- Iterate through selected items to find total start and end positions
         if numSelectedItems > 0 then
-            
-            -- Iterate through selected items to find start and end positions
             for i = 0, numSelectedItems - 1 do
                 local item = reaper.GetTrackMediaItem(track, i)
                 local itemStartPosition = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
@@ -32,37 +33,76 @@ function main()
                     endPosition = itemEndPosition
                 end
            end
+        else
+            -- We break this loop if there are no items selected
+            return 'n'
         end
-
-        local _, userInputEnvelopeIndex = reaper.GetUserInputs("User Input", 1, "Which lane?", "")
-        local envelopeIndex = tonumber(userInputEnvelopeIndex)
-        if envelopeIndex then
-            envelope = reaper.GetTrackEnvelope(track, envelopeIndex)
-            if envelope then
-                local pluginIndex = 0  -- Adjust based on the plugin you want to automate
-                local parameterIndex = 0  -- Adjust based on the parameter you want to automate
         
-                --local projectLength = math.floor(reaper.GetProjectLength())
+        if numSelectedItems > 0 then
+            local _, userInputEnvelopeIndex = reaper.GetUserInputs("User Input", 1, "Which lane?", "")
+            local envelopeIndex = tonumber(userInputEnvelopeIndex)
+            
+            if envelopeIndex then
+                envelope = reaper.GetTrackEnvelope(track, envelopeIndex)
+                if envelope then
                 
-                local _, userInputAutomationPoints = reaper.GetUserInputs("User Input", 1, "How many nodes, brodes?", "")
-                numberOfAutomationNodes = tonumber(userInputAutomationPoints)
+                    -- Store the automation values at the start and end now
+                    local _, startPositionAutomationValue = reaper.Envelope_Evaluate(envelope, startPosition, 0, 0)
+                    local _, endPositionAutomationValue = reaper.Envelope_Evaluate(envelope, endPosition, 0, 0)
                 
-                --local selectionLength = endPosition - startPosition
-                --local randomPositionOffset = math.random(0, math.ceil(selectionLength))
-                --local automationNodePosition = startPosition + randomPositionOffset
-                local automationNodePosition = math.random(math.floor(startPosition), math.ceil(endPosition))
-                
-                for i = 1, numberOfAutomationNodes do
-                    --local endTime = math.floor(reaper.GetProjectLength())
-                    local automationNodeValue = math.random()
-                    reaper.InsertEnvelopePoint(envelope, automationNodePosition, automationNodeValue, 0, 0, false, false)
-                    --local _, value = reaper.Envelope_Evaluate(envelope, automationNodePosition, 0, 0)
-                    --reaper.InsertEnvelopePoint(envelope, automationNodePosition, automationNodeValue, 0, 0, false, false)
-                    --reaper.GetSetAutomationItemInfo(envelope, 0, "", automationNodePosition, math.floor(endPosition), 1)
-                    local str = 'node inserted at: '..automationNodePosition..' , startPosition: '..startPosition .. ' , endPosition: '..endPosition
-                    reaper.ShowConsoleMsg(str.."\n")
+                    local pluginIndex = 0  -- Adjust based on the plugin you want to automate
+                    local parameterIndex = 0  -- Adjust based on the parameter you want to automate
+                    
+                    local _, userInputAutomationPoints = reaper.GetUserInputs("User Input", 1, "How many nodes, brodes?", "")
+                    numberOfAutomationNodes = tonumber(userInputAutomationPoints)
+                    
+                    local _, userInputMinValue = reaper.GetUserInputs("User Input", 1, "Minimum Value between 0 and 1?", "")
+                    local minimumValue = tonumber(userInputMinValue) or 0
+                    
+                    local _, userInputMaxValue = reaper.GetUserInputs("User Input", 1, "Maximum Value between 0 and 1?", "")
+                    local maximumValue = tonumber(userInputMaxValue) or 1
+                    
+                    if numberOfAutomationNodes then
+                        for i = 1, numberOfAutomationNodes do
+                            --local endTime = math.floor(reaper.GetProjectLength())
+                            local automationNodePosition = math.random(math.ceil(startPosition), math.floor(endPosition))
+                            if automationNodePosition < endPosition then
+                                automationNodePosition = automationNodePosition - math.random()
+                            elseif automationNodePosition > startPosition then
+                                automationNodePosition = automationNodePosition + math.random()
+                            end
+                            
+                            while(automationNodePosition < startPosition) 
+                            do
+                                automationNodePosition = automationNodePosition + math.random()
+                            end
+                            
+                            while(automationNodePosition > endPosition) 
+                            do
+                                automationNodePosition = automationNodePosition - math.random()
+                            end
+                            
+                            local automationNodeValue = math.random()
+                            
+                            while (automationNodeValue < minimumValue) or (automationNodeValue > maximumValue)
+                            do
+                                automationNodeValue = math.random()
+                            end
+                            
+                            reaper.InsertEnvelopePoint(envelope, automationNodePosition, automationNodeValue, 0, 0, false, false)
+            
+                            local str = 'node inserted at: '..automationNodePosition..' , startPosition: '..startPosition .. ' , endPosition: '..endPosition
+                            reaper.ShowConsoleMsg(str.."\n")
+                        end
+                        if not laneProcessedAlready[envelopeIndex] then
+                          -- Put in a start and end node to preserve values before and after our timeline affected area
+                          reaper.InsertEnvelopePoint(envelope, startPosition, startPositionAutomationValue, 0, 0, false, false)
+                          reaper.InsertEnvelopePoint(envelope, endPosition, endPositionAutomationValue, 0, 0, false, false)
+                          laneProcessedAlready[envelopeIndex] = true
+                        end
+                    end
                 end
-             end
+            end
         end
     end
     
@@ -70,7 +110,6 @@ function main()
     local _, userInputContinuePrompt = reaper.GetUserInputs("User Input", 1, "Type y to continue", "")
     return userInputContinuePrompt
 end
-
 
 while main() == 'y' do end
 
