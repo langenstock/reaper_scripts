@@ -8,7 +8,6 @@ function isTrackEmpty(track)
     return itemCount == 0
 end
 
--- Function to set the track color to red
 function setTrackColour(track, colour)
     reaper.SetTrackColor(track, colour)
 end
@@ -31,8 +30,5 @@ function main()
     end
 end
 
--- Run the main function
-reaper.Undo_BeginBlock()
-main()
-reaper.Undo_EndBlock("Color Empty Tracks Red", -1)
 
+main()

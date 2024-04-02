@@ -3,7 +3,7 @@
 -- Use this script for editing an already named asset where we want to 
 -- rerender the file with the exact same file name
 
-function createRegionsForClips()
+function main()
     local project = 0 -- 0 represents the active project, change if needed
 
     -- Get the total number of selected items in the project
@@ -14,13 +14,6 @@ function createRegionsForClips()
         reaper.ShowMessageBox("No selected items found.", "Error", 0)
         return
     end
-
-    -- Begin undo block
-    reaper.Undo_BeginBlock()
-    
-    local r = math.random(80, 255)
-    local g = math.random(80, 255)
-    local b = math.random(80, 255)
 
     -- Iterate through each item and create a region
     for i = 0, itemCount - 1 do
@@ -45,8 +38,6 @@ function createRegionsForClips()
             end
         end
     end
-    -- End undo block
-    reaper.Undo_EndBlock("Create Regions for Clips", -1)
 
     -- Update the arrange view to reflect the changes
     reaper.UpdateArrange()
@@ -54,5 +45,5 @@ function createRegionsForClips()
 end
 
 -- Run the function
-createRegionsForClips()
+main()
 

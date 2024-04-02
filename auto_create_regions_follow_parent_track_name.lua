@@ -35,8 +35,6 @@ function main()
         stringAtEndOfName = true
     end
 
-    -- Begin undo block
-    reaper.Undo_BeginBlock()
     local preiousItemTrackName = ''
     local runningRegionIndex = 1
 
@@ -95,19 +93,10 @@ function main()
         end
     end
 
-    -- End undo block
-    reaper.Undo_EndBlock("Create Regions for Clips", -1)
-
     -- Update the arrange view to reflect the changes
     reaper.UpdateArrange()
 
 end
 
-function checkForDuplicateRegionNames()
 
-end
-
--- Run the function
 main()
-checkForDuplicateRegionNames()
-

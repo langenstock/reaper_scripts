@@ -30,12 +30,7 @@ function main()
             if userOK then
                 -- Set the track name to the user's input
                 reaper.GetSetMediaTrackInfo_String(newTrack, "P_NAME", i_trackName, true)
-                --reaper.ShowConsoleMsg("New track created and renamed to: " .. i_trackName .. "\n")
-            else
-                --reaper.ShowConsoleMsg("User canceled the input. New track created without renaming.\n")
             end
-        else
-            --reaper.ShowConsoleMsg("Failed to get the newly created track.\n")
         end
         index = index + 1
     end

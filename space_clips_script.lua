@@ -10,7 +10,7 @@ function initialCheck()
     local initialSelectedItemscount = reaper.CountSelectedMediaItems(0)
 
     if initialSelectedItemscount < 2 then
-        reaper.ShowMessageBox("Select at least 2 clips, dipshit.", "Error", 0)
+        reaper.ShowMessageBox("Select at least 2 clips, <censored>.", "Error", 0)
         return false
     end
     return true
@@ -38,7 +38,7 @@ end
 
 function spaceOutSelectedItems()
 
-    -- Get the selected items
+    -- Get the selected items. Global variable
     selectedItems = reaper.CountSelectedMediaItems(0)
 
     -- Check if there are at least two items selected
@@ -66,7 +66,6 @@ function spaceOutSelectedItems()
         end
         
         local msg = 'previousPos: '..currentPosition..' , moving to: '..positionToMoveTo .. ' , previousClipEndPos: '..previousClipEndPos
-       -- reaper.ShowMessageBox(msg, "Error", 0)        
         reaper.SetMediaItemInfo_Value(item, "D_POSITION", positionToMoveTo)
         
         previousClipEndPos = positionToMoveTo + currentItemsLength
@@ -104,13 +103,13 @@ function main()
         if getSpacingValueFromUser() == true then
             for i = 1, 10 do
                 if i == 1 then
-                  spaceOutSelectedItems()
-                else
-                  if checkAllItemBoundaries() == false then
                     spaceOutSelectedItems()
-                  else
-                    return
-                  end
+                else
+                    if checkAllItemBoundaries() == false then
+                        spaceOutSelectedItems()
+                    else
+                        return
+                    end
                 end
             end
         end
@@ -118,7 +117,7 @@ function main()
     reaper.Undo_EndBlock("Space Out Selected Items", -1)
 end
 
--- Run main
+
 main()
 
 

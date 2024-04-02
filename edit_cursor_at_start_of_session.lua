@@ -1,4 +1,6 @@
-function setCursorToStart()  
+-- To mimic Pro Tool's Enter key function
+
+function main()  
   local project = 0
   local startPos = 0
   local moveView = true
@@ -7,5 +9,5 @@ function setCursorToStart()
   reaper.SetEditCurPos2(project, startPos, moveView, seekPlay)
 end
 
-setCursorToStart() 
+main() 
 

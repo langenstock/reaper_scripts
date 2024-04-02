@@ -10,7 +10,7 @@ local calculationsList = {
 }
 
 function main()
-    local project = 0 -- 0 represents the active project, change if needed
+    local project = 0
     local itemCount = reaper.CountSelectedMediaItems(project)
     
     -- Check if there are any items in the project
