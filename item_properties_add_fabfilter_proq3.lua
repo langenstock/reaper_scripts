@@ -1,15 +1,14 @@
 -- Specify the plugin name you want to insert
--- NOTE - at the moment this doesn't facilitate adding the plugin to index 2 if there is already takeFX active
 
 local pluginName = 'Pro-Q 3'
 
-function insertItemPropertiesFX()   
+function insertItemPropertiesFX()
     -- Get the active project
     local activeProjectIndex = 0
     local activeProject = reaper.EnumProjects(activeProjectIndex, 0)
     
     -- Get the selected item
-    local selectedItem = reaper.GetSelectedMediaItem(activeProject, 0)
+    local selectedItem = reaper.GetSelectedMediaItem(activeProjectIndex, 0)
     
     -- Check if a valid item is selected
     if selectedItem then
@@ -22,7 +21,8 @@ function insertItemPropertiesFX()
             local fxCount = reaper.TakeFX_GetCount(take)
     
             -- Search for the plugin in the plugin list
-            local pluginIndex = reaper.TakeFX_AddByName(take, pluginName, 1)
+            local nextAvailableSlot = -1
+            local pluginIndex = reaper.TakeFX_AddByName(take, pluginName, nextAvailableSlot)
     
             -- Check if the plugin was successfully inserted
             if pluginIndex ~= -1 then
@@ -35,7 +35,19 @@ function insertItemPropertiesFX()
             reaper.ShowMessageBox("No valid take found.", "Error", 0)
         end
     else
-        reaper.ShowMessageBox("No item selected.", "Error", 0)
+        -- If we are not selecting any item, then we want to see if we have a track selected
+        local numOfSelTracks = reaper.CountSelectedTracks(activeProjectIndex)
+        
+        if numOfSelTracks > 0 then
+            
+            local firstSelTrack = reaper.GetSelectedTrack(activeProjectIndex, 0)
+        
+            local _, userConfirm = reaper.GetUserInputs('About to add plugin to Track Insert', 1, 'Press y to continue', '')
+            
+            --if userConfirm == 'y' then
+            --    reaper.TrackFX_AddByName(firstSelTrack, pluginName, false, -1)
+            --end
+        end
     end
 end
 

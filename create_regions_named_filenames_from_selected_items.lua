@@ -14,6 +14,20 @@ function main()
         reaper.ShowMessageBox("No selected items found.", "Error", 0)
         return
     end
+    
+    -- Get front buffer time
+    _, userInputFrontBuffer = reaper.GetUserInputs('Time at front of region?', 1, '', '')
+    local frontEndBuffer = 0
+    if tonumber(userInputFrontBuffer) then
+        frontEndBuffer = tonumber(userInputFrontBuffer)
+    end
+    
+    -- Get back end buffer time
+    _, userInputBackEndBuffer = reaper.GetUserInputs('Time at end of region?', 1, '', '')
+    local backEndBuffer = 0
+    if tonumber(userInputBackEndBuffer) then
+        backEndBuffer = tonumber(userInputBackEndBuffer)
+    end
 
     -- Iterate through each item and create a region
     for i = 0, itemCount - 1 do
@@ -30,9 +44,15 @@ function main()
             local position = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
             local length = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
             
+            local regionStart = position - frontEndBuffer
+            -- make sure we are not going left of 0
+            regionStart = math.max(0, regionStart)
+            
+            local regionEnd = position + length + backEndBuffer
+            
             -- Create a region for each item
             local isrgn = true
-            local regionIndex = reaper.AddProjectMarker2(project, isrgn, position, position + length, take_name, -1, 0)
+            local regionIndex = reaper.AddProjectMarker2(project, isrgn, regionStart, regionEnd, take_name, -1, 0)
             if regionIndex == -1 then
               reaper.ShowMessageBox("Whoopsied.", "Error", 0)
             end
