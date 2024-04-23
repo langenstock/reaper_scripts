@@ -18,13 +18,13 @@ function main()
     end
     
     local replaceSpacesWithUnderscores = false 
-    local retval, userInput = reaper.GetUserInputs("User Input", 1, "Type y to replace space with _", "") 
+    local retval1, userInput = reaper.GetUserInputs("User Input", 1, "Type y to replace space with _", "") 
     if userInput == 'y' or userInput == 'Y' or userInput == 'yes' then
          replaceSpacesWithUnderscores = true
     end
     
     local stringAtFrontOfName = false
-    local _, userInputStringAtFront = reaper.GetUserInputs("User Input", 1, "String at the front of each name?", "")
+    local retval2, userInputStringAtFront = reaper.GetUserInputs("User Input", 1, "String at the front of each name?", "")
     if userInputStringAtFront ~= '' then
         stringAtFrontOfName = true
     end
