@@ -7,7 +7,7 @@ function main()
     local numOfSelItems = reaper.CountSelectedMediaItems(activeProj)
     
     local items = {}
-    if numOfSelItems > 0 then
+    if numOfSelItems > 1 then
         for i = 1, numOfSelItems do
              local j = i - 1
              
@@ -22,7 +22,7 @@ function main()
         table.sort(items, function(a, b) return a.pos < b.pos end)
         
         -- Prompt user for gaps between the items
-        local retval, userInput = reaper.GetUserInputs('Specify gap between items', 1, 'Type a number', '')
+        local retval, userInput = reaper.GetUserInputs('Set interval between items', 1, 'Type a number', '')
 
         userInput = tonumber(userInput)
         local specifiedGap = nil

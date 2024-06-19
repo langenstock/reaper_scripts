@@ -1,5 +1,3 @@
--- Work in progress
-
 function main()
     local _, textInputFreq = reaper.GetUserInputs("Input Base Frequency", 1, "Base Frequency:,extrawidth=200", "")
     local baseFrequency = tonumber(textInputFreq)
@@ -19,7 +17,7 @@ function printOutcome(freq, interval)
     local msg = 'Base Freq: '..baseFreq..' Hz, Interval: '
 
 
-    --reaper.ShowMessageBox("Base:, "Error", 0)
+    reaper.ShowMessageBox("Base:, "Error", 0)
 end
 
 

@@ -11,9 +11,9 @@ function main()
     if selectedTrack then
         -- Get the track index
         trackIndex = reaper.GetMediaTrackInfo_Value(selectedTrack, "IP_TRACKNUMBER")
-        reaper.ShowConsoleMsg("Selected Track Index: " .. trackIndex .. "\n")
+        --reaper.ShowConsoleMsg("Selected Track Index: " .. trackIndex .. "\n")
     else
-        reaper.ShowConsoleMsg("No track selected.\n")
+        --reaper.ShowConsoleMsg("No track selected.\n")
     end
     
     -- Check if there are selected items

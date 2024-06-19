@@ -18,7 +18,7 @@ function main()
     
     local str = 'test:  name: '..regions[1].name
     reaper.ShowMessageBox(str, "Error", 0)
-    return
+    --return
 
     -- Check for duplicates
     for i, r in ipairs(regions) do

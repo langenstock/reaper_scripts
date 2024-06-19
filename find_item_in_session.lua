@@ -8,7 +8,7 @@ function main()
     
     if allItemsCount > 0 then
         -- Prompt user for string to search
-        local retval, search = reaper.GetUserInputs('Whatchu need, dog?', 1, '', '')
+        local retval, search = reaper.GetUserInputs('Search Item Name', 1, '', '')
         
         if retval then
     
@@ -22,7 +22,12 @@ function main()
                 -- Get name of item
                 local takeName = reaper.GetTakeName(take)
                 
-                if string.match(takeName, search) then
+                -- Make both lower case
+                takeName = string.lower(takeName)
+                search = string.lower(search)
+                    
+                
+                if  takeName == search or string.find(takeName, search) then
                     -- We are looking at the correct take/item
                     
                     -- Get position of this item
@@ -38,6 +43,28 @@ function main()
                     if matchFound == false then
                         reaper.GetSet_ArrangeView2(activeProj, isSet, 0, 0, itemPos, itemEndPos)
                         matchFound = true
+                        reaper.UpdateTimeline()
+                        break
+                    end
+                end
+            end
+        end
+    else -- didn't find an item of this description
+        local _, num_markers, num_regions = reaper.CountProjectMarkers(activeProj)
+        local totalMarkers = num_markers + num_regions
+        -- Now look through regions
+        
+        if num_regions > 0 then
+            for i = 0, totalMarkers - 1 do
+                local retval, isrgn, pos, rgnend, name, markrgnindexnumber = reaper.EnumProjectMarkers2
+                                                                                            (activeProj, i)
+                
+                if isrgn then
+                    if name == search then
+                        reaper.GetSet_ArrangeView2(activeProj, isSet, 0, 0, pos, rgnend)
+                        matchFound = true
+                        
+                        break
                     end
                 end
             end

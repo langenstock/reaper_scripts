@@ -13,9 +13,9 @@ function main()
     
     local regionStartPos, regionEndPos
     if itemCount == 0 then
-        regionStartPos, regionEndPos = createRegionBasedOnItemSelections()
+        regionStartPos, regionEndPos = createRegionBasedOnLoopTimelineSelection()
     else
-        regionStartPos, regionEndPos = createRegionBasedOnTimelineSelection(itemCount)
+        regionStartPos, regionEndPos = createRegionBasedOnItemSelection(itemCount)
     end
     
     -- get the user's input
@@ -43,17 +43,21 @@ function main()
         end
     end
     
+    _, endPadInput = reaper.GetUserInputs("End Pad?", 1, '', '')
+    
+    local endPad = tonumber(endPadInput) or 0
+    
     -- If you click cancel or press ESC then don't place a region. Press Enter or click OK for an unnamed region to be created
     if retval then
         local newName = currentSuggestion or userInput
     
         -- Create a region for each item
         local isrgn = true
-        local regionIndex = reaper.AddProjectMarker2(activeProj, isrgn, regionStartPos, regionEndPos, newName, -1, 0)
+        local regionIndex = reaper.AddProjectMarker2(activeProj, isrgn, regionStartPos, (regionEndPos + endPad), newName, -1, 0)
     end
 end
 
-function createRegionBasedOnItemSelections()
+function createRegionBasedOnLoopTimelineSelection()
     local isSet = false
     local isLoop = false
     local autoSeek = false
@@ -62,7 +66,7 @@ function createRegionBasedOnItemSelections()
     return regionStartPos, regionEndPos
 end
 
-function createRegionBasedOnTimelineSelection(itemCount)
+function createRegionBasedOnItemSelection(itemCount)
     local regionStartPos = math.huge
     local regionEndPos = 0
 
